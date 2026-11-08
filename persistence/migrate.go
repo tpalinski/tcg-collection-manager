@@ -1,7 +1,14 @@
 package persistence
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"tcgcollectionmanager/persistence/entity"
+)
 
-func autoMigrate(db *gorm.DB) error {
-  return nil;
+func Migrate(db *gorm.DB) error {
+	err := db.AutoMigrate(&entity.Card{}, &entity.Collection{})
+	if err != nil {
+		return err
+	}
+	return nil
 }

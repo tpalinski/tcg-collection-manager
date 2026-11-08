@@ -10,8 +10,8 @@ type CollectionService struct {
 	Repo *repo.CollectionRepo
 }
 
-func toCollectionDTO(collection *entity.Collection) dto.CollectionDTO {
-	return dto.CollectionDTO{
+func toCollectionDTO(collection *entity.Collection) *dto.CollectionDTO {
+	return &dto.CollectionDTO{
 		Name:        collection.Name,
 		Description: collection.Description,
 		ID:          collection.ID,
@@ -20,7 +20,7 @@ func toCollectionDTO(collection *entity.Collection) dto.CollectionDTO {
 	}
 }
 
-func (c *CollectionService) Create(data *dto.CreateCollectionDTO) (dto.CollectionDTO, error) {
+func (c *CollectionService) Create(data *dto.CreateCollectionDTO) (*dto.CollectionDTO, error) {
 	var created entity.Collection
 	created.Name = data.Name
 	created.Description = data.Description
@@ -33,11 +33,15 @@ func (c *CollectionService) GetAll() []dto.CollectionDTO {
 	out := make([]dto.CollectionDTO, len(*res))
 	for _, e := range *res {
 		data := toCollectionDTO(&e)
-		out = append(out, data)
+		out = append(out, *data)
 	}
 	return out
 }
 
-func (c *CollectionService) Get(id *dto.CollectionIdDTO) (dto.CollectionDTO, error) {
-
+func (c *CollectionService) Get(id *dto.CollectionIdDTO) (*dto.CollectionDTO, error) {
+	fetched, err := c.Repo.Get(id.ID)
+	if err != nil {
+		return nil, err
+	}
+	return toCollectionDTO(fetched), nil
 }

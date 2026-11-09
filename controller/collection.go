@@ -15,7 +15,7 @@ type CollectionController struct {
 
 func parseId(r *http.Request) (uint, error) {
 	id, err := strconv.ParseUint(r.PathValue("id"), 10, 64)
-	if err != nil || id == 0 {
+	if err != nil {
 		return 0, errors.New("Invalid collection id")
 	}
 	return uint(id), nil

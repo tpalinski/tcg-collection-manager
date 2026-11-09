@@ -1,25 +1,23 @@
 package dto
 
 type PokemonCardDTO struct {
-	Category       string            `json:"category"`
-	ID             string            `json:"id"`
-	Illustrator    string            `json:"illustrator"`
-	Image          string            `json:"image"`
-	LocalID        string            `json:"localId"`
-	Name           string            `json:"name"`
-	Rarity         string            `json:"rarity"`
-	Set            CardSetDTO        `json:"set"`
-	Variants       CardVariantsDTO   `json:"variants"`
-	HP             *int              `json:"hp"`
-	Types          []string          `json:"types"`
-	EvolveFrom     *string           `json:"evolveFrom"`
-	Description    *string           `json:"description"`
-	Stage          *string           `json:"stage"`
-	Attacks        []CardAttackDTO   `json:"attacks"`
-	Weaknesses     []CardWeaknessDTO `json:"weaknesses"`
-	Retreat        *int              `json:"retreat"`
-	RegulationMark *string           `json:"regulationMark"`
-	Legal          CardLegalDTO      `json:"legal"`
+	Category       string          `json:"category"`
+	ID             string          `json:"id"`
+	Illustrator    string          `json:"illustrator"`
+	Image          string          `json:"image"`
+	LocalID        string          `json:"localId"`
+	Name           string          `json:"name"`
+	Rarity         string          `json:"rarity"`
+	Set            CardSetDTO      `json:"set"`
+	Variants       CardVariantsDTO `json:"variants"`
+	HP             *int            `json:"hp"`
+	Types          []string        `json:"types"`
+	EvolveFrom     *string         `json:"evolveFrom"`
+	Description    *string         `json:"description"`
+	Stage          *string         `json:"stage"`
+	Retreat        *int            `json:"retreat"`
+	RegulationMark *string         `json:"regulationMark"`
+	Legal          CardLegalDTO    `json:"legal"`
 }
 
 type CardSetDTO struct {

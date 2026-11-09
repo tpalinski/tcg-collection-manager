@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"tcgcollectionmanager/dto"
 )
@@ -14,6 +15,7 @@ type TCGDexClient struct {
 
 func (c *TCGDexClient) FindCard(cardId string) (*dto.PokemonCardDTO, error) {
 	url := fmt.Sprintf("%s/cards/%s", c.BaseUrl, cardId)
+	log.Printf("Hitting up %s to check for card: %s \n", url, cardId)
 
 	resp, err := c.Client.Get(url)
 	if err != nil {
@@ -27,6 +29,8 @@ func (c *TCGDexClient) FindCard(cardId string) (*dto.PokemonCardDTO, error) {
 
 	var card dto.PokemonCardDTO
 	if err := json.NewDecoder(resp.Body).Decode(&card); err != nil {
+		log.Println("The dto parsing has shat itself uwu")
+		log.Println(err.Error())
 		return nil, err
 	}
 

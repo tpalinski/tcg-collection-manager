@@ -25,6 +25,9 @@ type Container struct {
 	CollectionRepo       *repo.CollectionRepo
 	CollectionService    *service.CollectionService
 	CollectionController *controller.CollectionController
+	DeckRepo             *repo.DeckRepo
+	DeckService          *service.DeckService
+	DeckController       *controller.DeckController
 }
 
 func ResolveDB(c *Container) *gorm.DB {
@@ -36,6 +39,7 @@ func ResolveDB(c *Container) *gorm.DB {
 			panic("Could not open db, exiting")
 		}
 		db.SetupJoinTable(&entity.Collection{}, "Cards", &entity.CollectionCard{})
+		db.SetupJoinTable(&entity.Deck{}, "Cards", &entity.DeckCard{})
 		c.DB = db
 	}
 	return c.DB
@@ -90,6 +94,33 @@ func ResolveClient(c *Container) *client.TCGDexClient {
 		}
 	}
 	return c.Client
+}
+
+func ResolveDeckRepo(c *Container) *repo.DeckRepo {
+	if c.DeckRepo == nil {
+		c.DeckRepo = &repo.DeckRepo{DB: ResolveDB(c)}
+	}
+	return c.DeckRepo
+}
+
+func ResolveDeckService(c *Container) *service.DeckService {
+	if c.DeckService == nil {
+		c.DeckService = &service.DeckService{
+			Repo:           ResolveDeckRepo(c),
+			CollectionRepo: ResolveCollectionRepo(c),
+			CardService:    ResolveCardService(c),
+		}
+	}
+	return c.DeckService
+}
+
+func ResolveDeckController(c *Container) *controller.DeckController {
+	if c.DeckController == nil {
+		c.DeckController = &controller.DeckController{
+			Service: ResolveDeckService(c),
+		}
+	}
+	return c.DeckController
 }
 
 var App Container

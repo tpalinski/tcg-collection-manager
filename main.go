@@ -20,7 +20,8 @@ func main() {
 	mux := http.NewServeMux()
 	server := app.NewServer()
 	server.RegisterRoutes(mux)
+	handler := app.CORS(mux)
 	log.Println("Done")
 	log.Println("Starting to listen on port 2137")
-	http.ListenAndServe("0.0.0.0:2137", mux)
+	http.ListenAndServe("0.0.0.0:2137", handler)
 }

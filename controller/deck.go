@@ -126,7 +126,7 @@ func (c *DeckController) DeleteDeck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *DeckController) GetDeckCard(w http.ResponseWriter, r *http.Request) {
-	id, err := parseId(r)
+	id, err := parseDeckId(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -145,7 +145,7 @@ func (c *DeckController) GetDeckCard(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *DeckController) PutDeckCard(w http.ResponseWriter, r *http.Request) {
-	id, err := parseId(r)
+	id, err := parseDeckId(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

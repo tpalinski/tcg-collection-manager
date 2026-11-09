@@ -17,7 +17,7 @@ func (c *DeckRepo) Create(deck *entity.Deck) {
 
 func (c *DeckRepo) Get(id uint) (*entity.Deck, error) {
 	var res entity.Deck
-	result := c.DB.Preload("Cards").Model(&entity.Deck{}).First(&res, id)
+	result := c.DB.Preload("Cards").Preload("Collection").Model(&entity.Deck{}).First(&res, id)
 	return &res, result.Error
 }
 
@@ -29,7 +29,7 @@ func (c *DeckRepo) All() *[]entity.Deck {
 
 func (c *DeckRepo) CollectionAll(collection *entity.Collection) *[]entity.Deck {
 	var decks []entity.Deck
-	c.DB.Find(&decks, "collection_id = ?", collection.ID)
+	c.DB.Preload("Collection").Find(&decks, "collection_id = ?", collection.ID)
 	return &decks
 }
 

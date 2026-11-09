@@ -160,6 +160,184 @@ paths:
         "404":
           description: Collection or card not found
 
+  /collection/{id}/deck:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collection ID
+        schema:
+          type: integer
+          format: uint64
+          minimum: 1
+
+    get:
+      tags:
+        - decks
+      summary: Get all decks in a collection
+      operationId: getDecks
+      responses:
+        "200":
+          description: Decks retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeckDTO"
+        "400":
+          description: Invalid collection ID
+        "404":
+          description: Collection not found
+
+    post:
+      tags:
+        - decks
+      summary: Create a deck in a collection
+      operationId: createDeck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeckRequest"
+      responses:
+        "201":
+          description: Deck created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeckDTO"
+        "400":
+          description: Invalid collection ID or request body
+        "404":
+          description: Parent collection not found
+
+  /collection/{id}/deck/{deckId}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collection ID
+        schema:
+          type: integer
+          format: uint64
+          minimum: 1
+      - name: deckId
+        in: path
+        required: true
+        description: Deck ID
+        schema:
+          type: integer
+          format: uint64
+          minimum: 1
+
+    get:
+      tags:
+        - decks
+      summary: Get a deck
+      operationId: getDeck
+      responses:
+        "200":
+          description: Deck retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeckDTO"
+        "400":
+          description: Invalid collection or deck ID
+        "404":
+          description: Deck not found
+
+    put:
+      tags:
+        - decks
+      summary: Update a deck
+      operationId: updateDeck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeckDTO"
+      responses:
+        "201":
+          description: Deck updated successfully
+        "400":
+          description: Invalid ID or request body
+        "404":
+          description: Deck not found
+
+    delete:
+      tags:
+        - decks
+      summary: Delete a deck
+      operationId: deleteDeck
+      responses:
+        "204":
+          description: Deck deleted successfully
+        "400":
+          description: Invalid collection or deck ID
+        "404":
+          description: Deck not found
+
+  /collection/{id}/deck/{deckId}/cards:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collection ID
+        schema:
+          type: integer
+          format: uint64
+          minimum: 1
+      - name: deckId
+        in: path
+        required: true
+        description: Deck ID
+        schema:
+          type: integer
+          format: uint64
+          minimum: 1
+
+    get:
+      tags:
+        - decks
+      summary: Get cards in a deck
+      operationId: getDeckCards
+      responses:
+        "200":
+          description: Deck cards retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeckCardDTO"
+        "400":
+          description: Invalid collection or deck ID
+        "404":
+          description: Deck not found
+
+    put:
+      tags:
+        - decks
+      summary: Add or update a card in a deck
+      operationId: updateDeckCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeckCardDTO"
+      responses:
+        "201":
+          description: Deck card updated successfully
+        "400":
+          description: Invalid ID or request body
+        "404":
+          description: Deck or card not found
+
 components:
   schemas:
     CreateCollectionDTO:
@@ -260,3 +438,132 @@ components:
           format: uri
         category:
           type: string
+
+    CreateDeckRequest:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    CreateDeckDTO:
+      type: object
+      required:
+        - name
+        - description
+        - collectionId
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        collectionId:
+          type: integer
+          format: int64
+          minimum: 0
+
+    DeckDTO:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - collectionId
+        - collectionName
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          minimum: 0
+        name:
+          type: string
+        description:
+          type: string
+        collectionId:
+          type: integer
+          format: int64
+          minimum: 0
+        collectionName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DeckIdDTO:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+          minimum: 0
+
+    UpdateDeckDTO:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    UpdateDeckCardDTO:
+      type: object
+      required:
+        - cardId
+        - amount
+      properties:
+        cardId:
+          type: string
+        amount:
+          type: integer
+          format: int32
+          minimum: -32768
+          maximum: 32767
+
+    DeckCardDTO:
+      type: object
+      required:
+        - internalId
+        - amount
+        - name
+        - cardId
+        - imageUrl
+        - category
+        - inCollection
+      properties:
+        internalId:
+          type: integer
+          format: int64
+          minimum: 0
+        amount:
+          type: integer
+          format: int32
+          minimum: -32768
+          maximum: 32767
+        name:
+          type: string
+        cardId:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+        category:
+          type: string
+        inCollection:
+          type: integer
+          format: int32
+          minimum: -32768
+          maximum: 32767

@@ -62,6 +62,35 @@ func (c *DeckService) GetAllForCollection(collection dto.CollectionIdDTO) ([]dto
 	return out, nil
 }
 
+func (c *DeckService) GetMissingForCollection(collection dto.CollectionIdDTO) ([]dto.MissingCardDTO, error) {
+	col, err := c.CollectionRepo.Get(collection.ID)
+	if err != nil {
+		return nil, errors.New("No such collection exists")
+	}
+	missingMap := make(map[*entity.Deck][]dto.DeckCardMissingDTO)
+	collectionDecks := c.Repo.CollectionAll(col)
+	for _, deck := range *collectionDecks {
+		missing := make([]dto.DeckCardMissingDTO, 0)
+		for _, card := range deck.Cards {
+			collectionCounter, err := c.CollectionRepo.GetCollectionCard(col, card.ID)
+			deckCard, _ := c.Repo.GetDeckCard(&deck, card.ID)
+			if err != nil {
+				missing = append(missing, dto.DeckCardMissingDTO{
+					DeckID:  deck.ID,
+					Missing: deckCard.Amount,
+				})
+			} else if deckCard.Amount > collectionCounter.Amount {
+				missing = append(missing, dto.DeckCardMissingDTO{
+					DeckID:  deck.ID,
+					Missing: deckCard.Amount - collectionCounter.Amount,
+				})
+			}
+		}
+		missingMap[&deck] = missing
+	}
+	return nil, nil
+}
+
 func (c *DeckService) Get(id *dto.DeckIdDTO) (*dto.DeckDTO, error) {
 	fetched, err := c.Repo.Get(id.ID)
 	if err != nil {

@@ -1,0 +1,262 @@
+openapi: 3.1.0
+
+info:
+  title: TCGCollectionManager API
+  version: 0.1.0
+  description: Pokemon TCG collection and deck management API
+
+tags:
+  - name: collections
+    description: Collection management
+  - name: decks
+    description: Deck management
+
+paths:
+  /collection:
+    get:
+      tags:
+        - collections
+      summary: Get all collections
+      operationId: getCollections
+      responses:
+        "200":
+          description: Collections retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollectionDTO"
+
+    post:
+      tags:
+        - collections
+      summary: Create a collection
+      operationId: createCollection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCollectionDTO"
+      responses:
+        "201":
+          description: Collection created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionDTO"
+        "400":
+          description: Invalid request body
+        "500":
+          description: Internal server error
+
+  /collection/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collection ID
+        schema:
+          type: integer
+          format: uint64
+          minimum: 1
+
+    get:
+      tags:
+        - collections
+      summary: Get a collection
+      operationId: getCollection
+      responses:
+        "200":
+          description: Collection retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionDTO"
+        "400":
+          description: Invalid collection ID
+        "404":
+          description: Collection not found
+
+    put:
+      tags:
+        - collections
+      summary: Update a collection
+      operationId: updateCollection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCollectionDTO"
+      responses:
+        "201":
+          description: Collection updated successfully
+        "400":
+          description: Invalid ID or request body
+        "404":
+          description: Collection not found
+
+    delete:
+      tags:
+        - collections
+      summary: Delete a collection
+      operationId: deleteCollection
+      responses:
+        "204":
+          description: Collection deleted successfully
+        "400":
+          description: Invalid collection ID
+        "404":
+          description: Collection not found
+
+  /collection/{id}/cards:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Collection ID
+        schema:
+          type: integer
+          format: uint64
+          minimum: 1
+
+    get:
+      tags:
+        - collections
+      summary: Get cards in a collection
+      operationId: getCollectionCards
+      responses:
+        "200":
+          description: Collection cards retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollectionCardDTO"
+        "400":
+          description: Invalid collection ID
+        "404":
+          description: Collection not found
+
+    put:
+      tags:
+        - collections
+      summary: Add or update a card in a collection
+      operationId: updateCollectionCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCollectionCardDTO"
+      responses:
+        "201":
+          description: Collection card updated successfully
+        "400":
+          description: Invalid ID or request body
+        "404":
+          description: Collection or card not found
+
+components:
+  schemas:
+    CreateCollectionDTO:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    CollectionDTO:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          minimum: 0
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CollectionIdDTO:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+          minimum: 0
+
+    UpdateCollectionDTO:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    UpdateCollectionCardDTO:
+      type: object
+      required:
+        - cardId
+        - amount
+      properties:
+        cardId:
+          type: string
+        amount:
+          type: integer
+          format: int32
+          minimum: -32768
+          maximum: 32767
+
+    CollectionCardDTO:
+      type: object
+      required:
+        - internalId
+        - amount
+        - name
+        - cardId
+        - imageUrl
+        - category
+      properties:
+        internalId:
+          type: integer
+          format: int64
+          minimum: 0
+        amount:
+          type: integer
+          format: int32
+          minimum: -32768
+          maximum: 32767
+        name:
+          type: string
+        cardId:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+        category:
+          type: string

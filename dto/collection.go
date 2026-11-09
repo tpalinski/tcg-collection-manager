@@ -1,28 +1,39 @@
 package dto
 
+import "time"
+
 type CreateCollectionDTO struct {
-	Name        string
-	Description string
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type CollectionDTO struct {
-	ID          uint
-	Name        string
-	Description string
-	CreatedAt   string
-	UpdatedAt   string
+	ID          uint      `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 type CollectionIdDTO struct {
-	ID uint
+	ID uint `json:"id"`
 }
 
 type UpdateCollectionDTO struct {
-	Name        string
-	Description string
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type UpdateCollectionCardDTO struct {
-	CardId string
-	Amount int16
+	CardId string `json:"cardId"`
+	Amount int16  `json:"amount"`
+}
+
+type CollectionCardDTO struct {
+	Id       uint   `json:"internalId"`
+	Amount   int16  `json:"amount"`
+	Name     string `json:"name"`
+	CardId   string `json:"cardId"`
+	ImageUrl string `json:"imageUrl"`
+	Category string `json:"category"`
 }

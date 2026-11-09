@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"tcgcollectionmanager/app"
 	"tcgcollectionmanager/persistence"
-	"tcgcollectionmanager/persistence/entity"
 )
 
 func main() {
@@ -15,10 +15,12 @@ func main() {
 	if err != nil {
 		log.Panicf("Could not migrate the database: %s \n", err.Error())
 	}
-	repo := app.ResolveCardRepo(&app.App)
-	repo.Create(&entity.Card{
-		CardId:   "stuff",
-		Name:     "name",
-		ImageUrl: "chuj",
-	})
+	log.Println("Done")
+	log.Println("Registering route handlers...")
+	mux := http.NewServeMux()
+	server := app.NewServer()
+	server.RegisterRoutes(mux)
+	log.Println("Done")
+	log.Println("Starting to listen on port 2137")
+	http.ListenAndServe("0.0.0.0:2137", mux)
 }

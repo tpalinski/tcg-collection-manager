@@ -2,6 +2,9 @@ package app
 
 import (
 	"log"
+	"net/http"
+	"tcgcollectionmanager/client"
+	"tcgcollectionmanager/controller"
 	"tcgcollectionmanager/persistence/entity"
 	"tcgcollectionmanager/persistence/repo"
 	"tcgcollectionmanager/service"
@@ -11,13 +14,17 @@ import (
 )
 
 const dbName = "tcgmanager.sqlite"
+const tcgDexBaseUrl = "https://api.tcgdex.net/v2/en"
 
+// Register everything here (just the types i guess)
 type Container struct {
-	// Register everything here (just the types i guess)
-	DB                *gorm.DB
-	CardRepo          *repo.CardRepo
-	CollectionRepo    *repo.CollectionRepo
-	CollectionService *service.CollectionService
+	DB                   *gorm.DB
+	Client               *client.TCGDexClient
+	CardRepo             *repo.CardRepo
+	CardService          *service.CardService
+	CollectionRepo       *repo.CollectionRepo
+	CollectionService    *service.CollectionService
+	CollectionController *controller.CollectionController
 }
 
 func ResolveDB(c *Container) *gorm.DB {
@@ -41,6 +48,16 @@ func ResolveCardRepo(c *Container) *repo.CardRepo {
 	return c.CardRepo
 }
 
+func ResolveCardService(c *Container) *service.CardService {
+	if c.CardService == nil {
+		c.CardService = &service.CardService{
+			Client: ResolveClient(c),
+			Repo:   ResolveCardRepo(c),
+		}
+	}
+	return c.CardService
+}
+
 func ResolveCollectionRepo(c *Container) *repo.CollectionRepo {
 	if c.CollectionRepo == nil {
 		c.CollectionRepo = &repo.CollectionRepo{DB: ResolveDB(c)}
@@ -50,9 +67,29 @@ func ResolveCollectionRepo(c *Container) *repo.CollectionRepo {
 
 func ResolveCollectionService(c *Container) *service.CollectionService {
 	if c.CollectionService == nil {
-		c.CollectionService = &service.CollectionService{Repo: ResolveCollectionRepo(c)}
+		c.CollectionService = &service.CollectionService{
+			Repo:        ResolveCollectionRepo(c),
+			CardService: ResolveCardService(c),
+		}
 	}
 	return c.CollectionService
+}
+
+func ResolveCollectionController(c *Container) *controller.CollectionController {
+	if c.CollectionController == nil {
+		c.CollectionController = &controller.CollectionController{Service: *ResolveCollectionService(c)}
+	}
+	return c.CollectionController
+}
+
+func ResolveClient(c *Container) *client.TCGDexClient {
+	if c.Client == nil {
+		c.Client = &client.TCGDexClient{
+			Client:  &http.Client{},
+			BaseUrl: tcgDexBaseUrl,
+		}
+	}
+	return c.Client
 }
 
 var App Container

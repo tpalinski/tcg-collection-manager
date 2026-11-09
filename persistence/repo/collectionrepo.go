@@ -1,8 +1,10 @@
 package repo
 
 import (
-	"gorm.io/gorm"
 	"tcgcollectionmanager/persistence/entity"
+
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CollectionRepo struct {
@@ -15,7 +17,7 @@ func (c *CollectionRepo) Create(collection *entity.Collection) {
 
 func (c *CollectionRepo) Get(id uint) (*entity.Collection, error) {
 	var res entity.Collection
-	result := c.DB.Model(&entity.Collection{}).First(&res, id)
+	result := c.DB.Preload("Cards").Model(&entity.Collection{}).First(&res, id)
 	return &res, result.Error
 }
 
@@ -34,9 +36,28 @@ func (c *CollectionRepo) Update(collection *entity.Collection) {
 	c.DB.Save(collection)
 }
 
-func (c *CollectionRepo) UpdateCard(collection *entity.Collection, cardId uint, newAmount int16) {
+func (c *CollectionRepo) UpdateCard(collection *entity.Collection, cardId uint, newAmount int16) error {
+	mapping := entity.CollectionCard{
+		CollectionID: collection.ID,
+		CardID:       cardId,
+		Amount:       newAmount,
+	}
+
+	return c.DB.Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "collection_id"},
+			{Name: "card_id"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{"amount"}),
+	}).Create(&mapping).Error
+}
+
+func (c *CollectionRepo) DeleteCard(collection *entity.Collection, cardId uint) {
+	c.DB.Delete(&entity.CollectionCard{}, "card_id = ? AND collection_id = ?", cardId, collection.ID)
+}
+
+func (c *CollectionRepo) GetCollectionCard(collection *entity.Collection, cardId uint) (*entity.CollectionCard, error) {
 	var mapping entity.CollectionCard
-	c.DB.FirstOrCreate(&mapping, "card_id = ? AND collection_id = ?", cardId, collection.ID)
-	mapping.Amount = newAmount
-	c.DB.Save(&mapping)
+	res := c.DB.First(&mapping, "card_id = ? AND collection_id = ?", cardId, collection.ID)
+	return &mapping, res.Error
 }

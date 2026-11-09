@@ -7,4 +7,5 @@ type Card struct {
 	CardId   string
 	Name     string
 	ImageUrl string
+	Category string
 }
